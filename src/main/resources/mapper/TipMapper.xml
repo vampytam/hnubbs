@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hnu.bbs.mapper.TipMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hnu.bbs.entity.Tip">
+        <id column="id" property="id" />
+        <result column="content" property="content" />
+        <result column="author" property="author" />
+        <result column="using" property="using" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, content, author, using
+    </sql>
+
+    <select id="getRandomTip" resultType="com.hnu.bbs.entity.Tip">
+        select *
+        from bbs_tip
+        order by rand()
+        limit 1
+    </select>
+</mapper>

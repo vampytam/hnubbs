@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hnu.bbs.mapper.PostMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hnu.bbs.entity.Post">
+        <result column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="user_id" property="userId" />
+        <result column="comments" property="comments" />
+        <result column="collects" property="collects" />
+        <result column="views" property="views" />
+        <result column="top" property="top" />
+        <result column="quality" property="quality" />
+        <result column="section_id" property="sectionId" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+    </resultMap>
+
+    <!-- 不包含内容 -->
+    <resultMap id="postVO" type="com.hnu.bbs.entity.vo.PostVO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avatar" property="avatar"/>
+        <result column="comments" property="comments"/>
+        <result column="views" property="views"/>
+        <result column="collects" property="collects"/>
+        <result column="top" property="top"/>
+        <result column="quality" property="quality"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, content, user_id, comments, collects, views, top, quality, section_id, create_time, modify_time
+    </sql>
+
+    <!-- 根据条件查询帖子列表和分页 -->
+    <select id="selectListAndPage" resultMap="postVO">
+        SELECT
+        t.id,t.title,t.user_id,t.comments,
+        t.views,t.collects,t.top,t.quality,
+        t.create_time ,t.modify_time ,
+        u.username,u.nickname, u.avatar
+        FROM bbs_post t
+        LEFT JOIN bbs_user u
+        ON t.user_id = u.id
+        <where>
+            <!-- 如果tab为hot，则查询一周内的帖子 -->
+            <if test="tab == 'hot'">
+                date(t.create_time) &lt;= date_add(curdate(), interval 1 day)
+                and date(t.create_time) &gt;= date_sub(curdate(), interval 7 day)
+            </if>
+        </where>
+        <!-- 如果tab不为hot，则按创建时间降序排序 -->
+        <if test="tab != 'hot'">
+            order by t.create_time desc
+        </if>
+        <!-- 如果tab为hot，则按浏览量降序排序，如果浏览量相同，则按创建时间降序排序 -->
+        <if test="tab == 'hot'">
+            order by t.views desc, t.create_time desc
+        </if>
+    </select>
+
+    <!-- 根据帖子ID随机推荐帖子 -->
+    <select id="selectRecommend" resultType="com.hnu.bbs.entity.Post">
+        select *
+        from bbs_post t
+        where t.id != #{id}
+        order by rand(), t.views
+        limit 10
+    </select>
+
+    <!-- 关键词检索 -->
+    <select id="searchByKey" resultMap="postVO">
+        SELECT t.id, t.title, t.user_id, t.comments, t.views,
+        t.collects, t.top, t.quality, t.create_time, t.modify_time,
+        u.username, u.nickname, u.avatar
+        FROM bbs_post t LEFT JOIN bbs_user u
+        ON t.user_id = u.id
+        <where>
+            <if test="keyword!=null">
+                and (
+                    t.title like CONCAT('%', #{keyword}, '%')
+                    or t.title = #{keyword}
+                )
+            </if>
+        </where>
+        order by t.views desc, t.create_time desc
+    </select>
+
+</mapper>
