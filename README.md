@@ -1,9 +1,9 @@
-## mysql
-schema.sql
-data.sql
+### setup database using folloing mysql files
+- schema.sql   
+- data.sql   
 
-## maven
-mybatis-plus
-lombok
-jwt
-emoji
+### maven dependencies used in this project(see pom.xml)
+- mybatis-plus   
+- lombok   
+- jwt   
+- emoji   
