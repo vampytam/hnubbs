@@ -1,8 +1,8 @@
-### setup database using folloing mysql files
+### setup database using following mysql files
 - schema.sql   
 - data.sql   
 
-### maven dependencies used in this project(see pom.xml)
+### maven dependencies used in this project (see pom.xml)
 - mybatis-plus   
 - lombok   
 - jwt   
